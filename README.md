@@ -1,20 +1,20 @@
 # auth-admin-but-java
 
-Admin console for [`auth-server-but-java`](../auth-server-but-java) — Next.js 16 (App Router, React 19, Tailwind v4, Server Actions).
+Admin console for [`auth-server-but-java`](https://github.com/x-erika/auth-server-but-java) — Next.js 16 (App Router, React 19, Tailwind v4, Server Actions).
 
 Login as an admin user, list users and roles, and assign/revoke roles via point-and-click.
 
 ## Quick start
 
 ```bash
-# 1. Auth server running on http://localhost:8080
-cd ../auth-server-but-java && ./mvnw quarkus:dev
-
-# 2. Admin UI (this directory)
 npm install
 npm run dev
 # → http://localhost:3000
 ```
+
+Requires [`auth-server-but-java`](https://github.com/x-erika/auth-server-but-java)
+running and reachable at `AUTH_BACKEND_URL` (defaults to
+`http://localhost:8080`).
 
 Login with the bootstrap admin: `admin@gmail.com` / `admin123`.
 
