@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { backend } from "@/lib/backend";
 import type { AdminUserSummary, RoleSummary } from "@/lib/types";
 import { toggleRoleAction } from "./actions";
@@ -24,14 +25,22 @@ export default async function UsersPage() {
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-          Users
-        </h1>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          {users.length} user{users.length === 1 ? "" : "s"} · click a role chip
-          to assign or revoke
-        </p>
+      <header className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+            Users
+          </h1>
+          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+            {users.length} user{users.length === 1 ? "" : "s"} · click the
+            username to manage, role chips to assign/revoke
+          </p>
+        </div>
+        <Link
+          href="/dashboard/users/new"
+          className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+        >
+          New user
+        </Link>
       </header>
 
       <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
@@ -47,9 +56,12 @@ export default async function UsersPage() {
             {users.map((user) => (
               <tr key={user.id}>
                 <td className="px-6 py-4">
-                  <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                  <Link
+                    href={`/dashboard/users/${user.id}`}
+                    className="text-sm font-medium text-zinc-900 hover:underline dark:text-zinc-50"
+                  >
                     {user.username}
-                  </p>
+                  </Link>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400">
                     {user.email}
                   </p>

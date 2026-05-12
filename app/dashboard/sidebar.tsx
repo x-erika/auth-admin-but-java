@@ -9,6 +9,9 @@ const navItems = [
   { href: "/dashboard", label: "Overview" },
   { href: "/dashboard/users", label: "Users" },
   { href: "/dashboard/roles", label: "Roles" },
+  { href: "/dashboard/clients", label: "Clients" },
+  { href: "/dashboard/sessions", label: "Active sessions" },
+  { href: "/dashboard/keys", label: "Signing keys" },
 ];
 
 function isActive(currentPath: string, href: string): boolean {

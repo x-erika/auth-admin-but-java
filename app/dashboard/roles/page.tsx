@@ -1,5 +1,6 @@
 import { backend } from "@/lib/backend";
 import type { RoleSummary } from "@/lib/types";
+import { setParentAction } from "./actions";
 
 export default async function RolesPage() {
   const res = await backend<RoleSummary[]>("/admin/roles");
@@ -18,6 +19,7 @@ export default async function RolesPage() {
   }
 
   const roles = res.data;
+  const nameById = new Map(roles.map((r) => [r.id, r.name]));
 
   return (
     <div className="space-y-6">
@@ -26,7 +28,8 @@ export default async function RolesPage() {
           Roles
         </h1>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          {roles.length} role{roles.length === 1 ? "" : "s"} seeded at startup
+          {roles.length} role{roles.length === 1 ? "" : "s"} · pick a parent to
+          inherit its permissions (effective roles cascade upward)
         </p>
       </header>
 
@@ -36,27 +39,40 @@ export default async function RolesPage() {
             <tr>
               <th className="px-6 py-3">Name</th>
               <th className="px-6 py-3">Description</th>
-              <th className="px-6 py-3">ID</th>
+              <th className="px-6 py-3">Inherits from</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
-            {roles.map((role) => (
-              <tr key={role.id}>
-                <td className="px-6 py-4">
-                  <span className="inline-flex items-center rounded-full bg-zinc-900 px-3 py-1 text-xs font-medium text-white dark:bg-zinc-50 dark:text-zinc-900">
-                    {role.name}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm text-zinc-700 dark:text-zinc-300">
-                  {role.description ?? (
-                    <span className="text-zinc-400 dark:text-zinc-600">—</span>
-                  )}
-                </td>
-                <td className="px-6 py-4 font-mono text-xs text-zinc-500 dark:text-zinc-400">
-                  {role.id}
-                </td>
-              </tr>
-            ))}
+            {roles.map((role) => {
+              const parentName = role.parentId
+                ? (nameById.get(role.parentId) ?? "(unknown)")
+                : null;
+              return (
+                <tr key={role.id}>
+                  <td className="px-6 py-4">
+                    <span className="inline-flex items-center rounded-full bg-zinc-900 px-3 py-1 text-xs font-medium text-white dark:bg-zinc-50 dark:text-zinc-900">
+                      {role.name}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-zinc-700 dark:text-zinc-300">
+                    {role.description ?? (
+                      <span className="text-zinc-400 dark:text-zinc-600">
+                        —
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4">
+                    <ParentSelector
+                      currentChild={role.name}
+                      currentParent={parentName}
+                      candidates={roles
+                        .filter((r) => r.name !== role.name)
+                        .map((r) => r.name)}
+                    />
+                  </td>
+                </tr>
+              );
+            })}
             {roles.length === 0 && (
               <tr>
                 <td
@@ -71,5 +87,42 @@ export default async function RolesPage() {
         </table>
       </div>
     </div>
+  );
+}
+
+function ParentSelector({
+  currentChild,
+  currentParent,
+  candidates,
+}: {
+  currentChild: string;
+  currentParent: string | null;
+  candidates: string[];
+}) {
+  return (
+    <form
+      action={setParentAction}
+      className="flex items-center gap-2"
+    >
+      <input type="hidden" name="child" value={currentChild} />
+      <select
+        name="parent"
+        defaultValue={currentParent ?? ""}
+        className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs text-zinc-700 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-300"
+      >
+        <option value="">— none —</option>
+        {candidates.map((name) => (
+          <option key={name} value={name}>
+            {name}
+          </option>
+        ))}
+      </select>
+      <button
+        type="submit"
+        className="rounded-md border border-zinc-300 px-2 py-1 text-xs font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+      >
+        Save
+      </button>
+    </form>
   );
 }
