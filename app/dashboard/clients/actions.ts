@@ -89,9 +89,17 @@ export async function updateClientAction(
 export async function deleteClientAction(formData: FormData): Promise<void> {
   const id = formData.get("id")?.toString();
   if (!id) return;
-  await backend<unknown>(`/admin/clients/${encodeURIComponent(id)}`, {
-    method: "DELETE",
-  });
+  const res = await backend<unknown>(
+    `/admin/clients/${encodeURIComponent(id)}`,
+    { method: "DELETE" },
+  );
+  if (!res.ok) {
+    console.error(
+      `[deleteClientAction] DELETE /admin/clients/${id} failed: ${res.error}`,
+    );
+    revalidatePath(`/dashboard/clients/${id}`);
+    return;
+  }
   revalidatePath("/dashboard/clients");
   redirect("/dashboard/clients");
 }
@@ -100,10 +108,16 @@ export async function addRedirectUriAction(formData: FormData): Promise<void> {
   const clientId = formData.get("clientId")?.toString();
   const uri = formData.get("uri")?.toString().trim();
   if (!clientId || !uri) return;
-  await backend<unknown>(
+  const res = await backend<unknown>(
     `/admin/clients/${encodeURIComponent(clientId)}/redirect-uris`,
     { method: "POST", body: { uri } },
   );
+  if (!res.ok) {
+    console.error(
+      `[addRedirectUriAction] POST /admin/clients/${clientId}/redirect-uris failed: ${res.error}`,
+    );
+    return;
+  }
   revalidatePath(`/dashboard/clients/${clientId}`);
 }
 
@@ -113,9 +127,15 @@ export async function removeRedirectUriAction(
   const clientId = formData.get("clientId")?.toString();
   const uriId = formData.get("uriId")?.toString();
   if (!clientId || !uriId) return;
-  await backend<unknown>(
+  const res = await backend<unknown>(
     `/admin/clients/${encodeURIComponent(clientId)}/redirect-uris/${encodeURIComponent(uriId)}`,
     { method: "DELETE" },
   );
+  if (!res.ok) {
+    console.error(
+      `[removeRedirectUriAction] DELETE /admin/clients/${clientId}/redirect-uris/${uriId} failed: ${res.error}`,
+    );
+    return;
+  }
   revalidatePath(`/dashboard/clients/${clientId}`);
 }

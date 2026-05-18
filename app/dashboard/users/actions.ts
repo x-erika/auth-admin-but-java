@@ -24,10 +24,17 @@ export async function toggleRoleAction(formData: FormData): Promise<void> {
   if (!userId || !roleName) return;
 
   const method = action === "revoke" ? "DELETE" : "POST";
-  await backend<unknown>(
+  const res = await backend<unknown>(
     `/admin/users/${encodeURIComponent(userId)}/roles/${encodeURIComponent(roleName)}`,
     { method },
   );
+
+  if (!res.ok) {
+    console.error(
+      `[toggleRoleAction] ${method} /admin/users/${userId}/roles/${roleName} failed: ${res.error}`,
+    );
+    return;
+  }
 
   revalidatePath("/dashboard/users");
   revalidatePath(`/dashboard/users/${userId}`);
@@ -93,9 +100,14 @@ export async function updateUserAction(
 export async function deleteUserAction(formData: FormData): Promise<void> {
   const id = formData.get("id")?.toString();
   if (!id) return;
-  await backend<unknown>(`/admin/users/${encodeURIComponent(id)}`, {
+  const res = await backend<unknown>(`/admin/users/${encodeURIComponent(id)}`, {
     method: "DELETE",
   });
+  if (!res.ok) {
+    console.error(`[deleteUserAction] DELETE /admin/users/${id} failed: ${res.error}`);
+    revalidatePath(`/dashboard/users/${id}`);
+    return;
+  }
   revalidatePath("/dashboard/users");
   redirect("/dashboard/users");
 }
@@ -104,9 +116,16 @@ export async function revokeConsentAction(formData: FormData): Promise<void> {
   const consentId = formData.get("consentId")?.toString();
   const userId = formData.get("userId")?.toString();
   if (!consentId) return;
-  await backend<unknown>(`/admin/consents/${encodeURIComponent(consentId)}`, {
-    method: "DELETE",
-  });
+  const res = await backend<unknown>(
+    `/admin/consents/${encodeURIComponent(consentId)}`,
+    { method: "DELETE" },
+  );
+  if (!res.ok) {
+    console.error(
+      `[revokeConsentAction] DELETE /admin/consents/${consentId} failed: ${res.error}`,
+    );
+    return;
+  }
   if (userId) {
     revalidatePath(`/dashboard/users/${userId}`);
   }

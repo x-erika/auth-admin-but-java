@@ -8,16 +8,22 @@ export async function setParentAction(formData: FormData): Promise<void> {
   const parent = formData.get("parent")?.toString() ?? "";
   if (!child) return;
 
-  if (!parent) {
-    await backend<unknown>(
-      `/admin/roles/${encodeURIComponent(child)}/parent`,
-      { method: "DELETE" },
-    );
-  } else {
-    await backend<unknown>(
-      `/admin/roles/${encodeURIComponent(child)}/parent/${encodeURIComponent(parent)}`,
-      { method: "POST" },
-    );
+  const res = !parent
+    ? await backend<unknown>(
+        `/admin/roles/${encodeURIComponent(child)}/parent`,
+        { method: "DELETE" },
+      )
+    : await backend<unknown>(
+        `/admin/roles/${encodeURIComponent(child)}/parent/${encodeURIComponent(parent)}`,
+        { method: "POST" },
+      );
+
+  if (!res.ok) {
+    const path = parent
+      ? `POST /admin/roles/${child}/parent/${parent}`
+      : `DELETE /admin/roles/${child}/parent`;
+    console.error(`[setParentAction] ${path} failed: ${res.error}`);
+    return;
   }
 
   revalidatePath("/dashboard/roles");
