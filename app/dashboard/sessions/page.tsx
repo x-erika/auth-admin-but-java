@@ -34,8 +34,8 @@ export default async function SessionsPage() {
         </p>
       </header>
 
-      <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-        <table className="w-full">
+      <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+        <table className="w-full min-w-[720px]">
           <thead className="border-b border-zinc-200 bg-zinc-50 text-left text-xs font-medium uppercase tracking-wide text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
             <tr>
               <th className="px-6 py-3">User</th>
@@ -60,7 +60,10 @@ export default async function SessionsPage() {
                   <p className="font-mono text-xs text-zinc-700 dark:text-zinc-300">
                     {s.ipAddress ?? "—"}
                   </p>
-                  <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
+                  <p
+                    className="max-w-[260px] truncate text-xs text-zinc-500 dark:text-zinc-400"
+                    title={s.userAgent ?? ""}
+                  >
                     {s.userAgent ?? ""}
                   </p>
                 </td>

@@ -94,10 +94,10 @@ export default async function ClientDetailPage({ params, searchParams }: Props) 
               key={r.id}
               className="flex items-center justify-between gap-3 rounded-md border border-zinc-200 px-3 py-2 dark:border-zinc-800"
             >
-              <code className="break-all text-xs text-zinc-700 dark:text-zinc-300">
+              <code className="min-w-0 flex-1 break-all text-xs text-zinc-700 dark:text-zinc-300">
                 {r.uri}
               </code>
-              <form action={removeRedirectUriAction}>
+              <form action={removeRedirectUriAction} className="shrink-0">
                 <input type="hidden" name="clientId" value={client.id} />
                 <input type="hidden" name="uriId" value={r.id} />
                 <ConfirmSubmit

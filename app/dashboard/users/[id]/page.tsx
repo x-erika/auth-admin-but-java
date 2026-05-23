@@ -114,16 +114,19 @@ export default async function UserDetailPage({ params, searchParams }: Props) {
                 key={s.id}
                 className="flex items-center justify-between gap-3 rounded-md border border-zinc-200 px-3 py-2 dark:border-zinc-800"
               >
-                <div>
+                <div className="min-w-0 flex-1">
                   <p className="font-mono text-xs text-zinc-700 dark:text-zinc-300">
                     {s.ipAddress ?? "—"}
                   </p>
-                  <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
+                  <p
+                    className="truncate text-xs text-zinc-500 dark:text-zinc-400"
+                    title={s.userAgent ?? ""}
+                  >
                     {s.userAgent ?? ""} · last accessed{" "}
                     {formatDate(s.lastAccessedAt)}
                   </p>
                 </div>
-                <form action={revokeSessionAction}>
+                <form action={revokeSessionAction} className="shrink-0">
                   <input type="hidden" name="id" value={s.id} />
                   <input type="hidden" name="userId" value={user.id} />
                   <ConfirmSubmit
@@ -154,15 +157,15 @@ export default async function UserDetailPage({ params, searchParams }: Props) {
                 key={c.id}
                 className="flex items-center justify-between gap-3 rounded-md border border-zinc-200 px-3 py-2 dark:border-zinc-800"
               >
-                <div>
-                  <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-50">
                     {c.clientName ?? c.clientId ?? "(unknown client)"}
                   </p>
-                  <p className="font-mono text-xs text-zinc-500 dark:text-zinc-400">
+                  <p className="truncate font-mono text-xs text-zinc-500 dark:text-zinc-400">
                     {c.scopes} · granted {formatDate(c.grantedAt)}
                   </p>
                 </div>
-                <form action={revokeConsentAction}>
+                <form action={revokeConsentAction} className="shrink-0">
                   <input type="hidden" name="consentId" value={c.id} />
                   <input type="hidden" name="userId" value={user.id} />
                   <ConfirmSubmit
