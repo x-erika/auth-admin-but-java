@@ -7,14 +7,17 @@ import {
   removeRedirectUriAction,
   updateClientAction,
 } from "../actions";
+import ConfirmSubmit from "../../_components/confirm-submit";
 import ClientForm from "../client-form";
 
 type Props = {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ error?: string }>;
 };
 
-export default async function ClientDetailPage({ params }: Props) {
+export default async function ClientDetailPage({ params, searchParams }: Props) {
   const { id } = await params;
+  const { error } = await searchParams;
   const res = await backend<ClientSummary>(`/admin/clients/${id}`);
 
   if (!res.ok) {
@@ -42,6 +45,11 @@ export default async function ClientDetailPage({ params }: Props) {
         >
           ← Back to clients
         </Link>
+        {error && (
+          <div className="mt-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
+            Delete failed: {error}
+          </div>
+        )}
         <div className="mt-2 flex items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
@@ -53,12 +61,12 @@ export default async function ClientDetailPage({ params }: Props) {
           </div>
           <form action={deleteClientAction}>
             <input type="hidden" name="id" value={client.id} />
-            <button
-              type="submit"
+            <ConfirmSubmit
+              message={`Delete OAuth client "${client.name ?? client.clientId}" (${client.clientId})?\n\nThis removes its redirect URIs and revokes every refresh token issued to it. Any application using this client_id will stop working immediately. This cannot be undone.`}
               className="rounded-md border border-red-300 px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50 dark:border-red-900 dark:text-red-300 dark:hover:bg-red-950"
             >
               Delete client
-            </button>
+            </ConfirmSubmit>
           </form>
         </div>
       </header>
@@ -92,12 +100,12 @@ export default async function ClientDetailPage({ params }: Props) {
               <form action={removeRedirectUriAction}>
                 <input type="hidden" name="clientId" value={client.id} />
                 <input type="hidden" name="uriId" value={r.id} />
-                <button
-                  type="submit"
+                <ConfirmSubmit
+                  message={`Remove redirect URI?\n\n${r.uri}\n\nIf the client app is using this exact URI in its callback, authorization-code flows will fail.`}
                   className="rounded-md border border-zinc-300 px-2 py-1 text-xs font-medium text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800"
                 >
                   Remove
-                </button>
+                </ConfirmSubmit>
               </form>
             </li>
           ))}

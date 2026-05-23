@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { backend } from "@/lib/backend";
 import type { AdminUserSummary, MeResponse, RoleSummary } from "@/lib/types";
 
@@ -41,7 +42,7 @@ function StatCard({
   href: string;
 }) {
   return (
-    <a
+    <Link
       href={href}
       className="block rounded-lg border border-zinc-200 bg-white p-6 transition-colors hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700"
     >
@@ -51,6 +52,6 @@ function StatCard({
       <p className="mt-2 text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
         {value}
       </p>
-    </a>
+    </Link>
   );
 }

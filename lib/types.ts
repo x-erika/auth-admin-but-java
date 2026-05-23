@@ -36,7 +36,7 @@ export type KeyEntry = {
 };
 
 export type KeyListResponse = {
-  active_kid: string;
+  activeKid: string;
   keys: KeyEntry[];
 };
 

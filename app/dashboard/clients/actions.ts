@@ -97,8 +97,11 @@ export async function deleteClientAction(formData: FormData): Promise<void> {
     console.error(
       `[deleteClientAction] DELETE /admin/clients/${id} failed: ${res.error}`,
     );
+    // Bounce back to the detail page with the backend's error message in the
+    // querystring so the admin can see why the delete failed instead of being
+    // silently kicked back to the list as if nothing happened.
     revalidatePath(`/dashboard/clients/${id}`);
-    return;
+    redirect(`/dashboard/clients/${id}?error=${encodeURIComponent(res.error)}`);
   }
   revalidatePath("/dashboard/clients");
   redirect("/dashboard/clients");

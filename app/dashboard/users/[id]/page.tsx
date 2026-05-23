@@ -11,12 +11,17 @@ import {
   updateUserAction,
 } from "../actions";
 import { revokeSessionAction } from "../../sessions/actions";
+import ConfirmSubmit from "../../_components/confirm-submit";
 import UserEditForm from "../user-edit-form";
 
-type Props = { params: Promise<{ id: string }> };
+type Props = {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ error?: string }>;
+};
 
-export default async function UserDetailPage({ params }: Props) {
+export default async function UserDetailPage({ params, searchParams }: Props) {
   const { id } = await params;
+  const { error } = await searchParams;
 
   const [userRes, sessionsRes, consentsRes] = await Promise.all([
     backend<AdminUserSummary>(`/admin/users/${id}`),
@@ -51,6 +56,11 @@ export default async function UserDetailPage({ params }: Props) {
         >
           ← Back to users
         </Link>
+        {error && (
+          <div className="mt-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
+            Delete failed: {error}
+          </div>
+        )}
         <div className="mt-2 flex items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
@@ -75,12 +85,12 @@ export default async function UserDetailPage({ params }: Props) {
           </div>
           <form action={deleteUserAction}>
             <input type="hidden" name="id" value={user.id} />
-            <button
-              type="submit"
+            <ConfirmSubmit
+              message={`Delete user ${user.username} (${user.email})?\n\nThis permanently removes their credentials, active sessions, refresh tokens, granted consents, and role assignments. This cannot be undone.`}
               className="rounded-md border border-red-300 px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50 dark:border-red-900 dark:text-red-300 dark:hover:bg-red-950"
             >
               Delete user
-            </button>
+            </ConfirmSubmit>
           </form>
         </div>
       </header>
@@ -116,12 +126,12 @@ export default async function UserDetailPage({ params }: Props) {
                 <form action={revokeSessionAction}>
                   <input type="hidden" name="id" value={s.id} />
                   <input type="hidden" name="userId" value={user.id} />
-                  <button
-                    type="submit"
+                  <ConfirmSubmit
+                    message={`Revoke this session?\n\nIP: ${s.ipAddress ?? "—"}\n${s.userAgent ?? ""}\n\nThe user will be forced to sign in again and any refresh tokens issued to this session will be invalidated.`}
                     className="rounded-md border border-zinc-300 px-2 py-1 text-xs font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
                   >
                     Revoke
-                  </button>
+                  </ConfirmSubmit>
                 </form>
               </li>
             ))}
@@ -155,12 +165,12 @@ export default async function UserDetailPage({ params }: Props) {
                 <form action={revokeConsentAction}>
                   <input type="hidden" name="consentId" value={c.id} />
                   <input type="hidden" name="userId" value={user.id} />
-                  <button
-                    type="submit"
+                  <ConfirmSubmit
+                    message={`Revoke consent for ${c.clientName ?? c.clientId ?? "this client"}?\n\nThe user will be prompted again the next time the app requests access.`}
                     className="rounded-md border border-zinc-300 px-2 py-1 text-xs font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
                   >
                     Revoke
-                  </button>
+                  </ConfirmSubmit>
                 </form>
               </li>
             ))}

@@ -1,5 +1,6 @@
 import { backend } from "@/lib/backend";
 import type { KeyListResponse } from "@/lib/types";
+import ConfirmSubmit from "../_components/confirm-submit";
 import { rotateKeyAction } from "./actions";
 
 export default async function KeysPage() {
@@ -18,7 +19,7 @@ export default async function KeysPage() {
     );
   }
 
-  const { active_kid, keys } = res.data;
+  const { activeKid, keys } = res.data;
 
   return (
     <div className="space-y-6">
@@ -35,19 +36,19 @@ export default async function KeysPage() {
           </p>
         </div>
         <form action={rotateKeyAction}>
-          <button
-            type="submit"
+          <ConfirmSubmit
+            message={`Rotate signing keys now?\n\nA new RSA-2048 keypair will be generated and become the active signing key. The current key (${activeKid}) stays in the JWKS so tokens already issued continue to verify until they expire, but every new JWT will be signed by the new kid.`}
             className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
           >
             Rotate now
-          </button>
+          </ConfirmSubmit>
         </form>
       </header>
 
       <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 text-xs text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
         Active kid:{" "}
         <span className="font-mono font-medium text-zinc-900 dark:text-zinc-100">
-          {active_kid}
+          {activeKid}
         </span>
       </div>
 

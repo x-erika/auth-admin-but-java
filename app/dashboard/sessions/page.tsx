@@ -1,5 +1,6 @@
 import { backend } from "@/lib/backend";
 import type { SessionSummary } from "@/lib/types";
+import ConfirmSubmit from "../_components/confirm-submit";
 import { revokeSessionAction } from "./actions";
 
 export default async function SessionsPage() {
@@ -72,12 +73,12 @@ export default async function SessionsPage() {
                 <td className="px-6 py-4 text-right">
                   <form action={revokeSessionAction}>
                     <input type="hidden" name="id" value={s.id} />
-                    <button
-                      type="submit"
+                    <ConfirmSubmit
+                      message={`Revoke session for ${s.username ?? s.email ?? "this user"}?\n\nIP: ${s.ipAddress ?? "—"}\n\nThey will be forced to sign in again. If this is your own session you will be signed out.`}
                       className="rounded-md border border-zinc-300 px-2 py-1 text-xs font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
                     >
                       Revoke
-                    </button>
+                    </ConfirmSubmit>
                   </form>
                 </td>
               </tr>

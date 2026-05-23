@@ -105,8 +105,11 @@ export async function deleteUserAction(formData: FormData): Promise<void> {
   });
   if (!res.ok) {
     console.error(`[deleteUserAction] DELETE /admin/users/${id} failed: ${res.error}`);
+    // Bounce back to the detail page with the backend's error message in the
+    // querystring so the admin can see why the delete failed instead of being
+    // silently kicked back to the list as if nothing happened.
     revalidatePath(`/dashboard/users/${id}`);
-    return;
+    redirect(`/dashboard/users/${id}?error=${encodeURIComponent(res.error)}`);
   }
   revalidatePath("/dashboard/users");
   redirect("/dashboard/users");
